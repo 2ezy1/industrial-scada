@@ -406,11 +406,12 @@
         /* ============================================ */
         .dashboard-grid {
             display: flex;
-            flex-wrap: nowrap;
+            flex-wrap: wrap;
             gap: var(--space-sm);
             margin-bottom: var(--space-md);
-            overflow-x: auto;
+            overflow-x: visible;
             padding-bottom: var(--space-xs);
+            width: 100%;
         }
 
         .card {
@@ -418,6 +419,8 @@
             border: 1px solid var(--color-border);
             border-radius: 0.75rem;
             padding: 0.5rem 0.75rem;
+            min-width: 160px;
+            flex: 1 1 auto;
             transition: all 0.3s ease;
             position: relative;
             overflow: hidden;
@@ -528,7 +531,7 @@
 
         /* map page container */
         .map-container {
-            position: relative;
+            position: absolute;
             top: 0;
             left: 0;
             width: 100%;
@@ -814,7 +817,7 @@
             }
             
             .area-cards-grid {
-                grid-template-columns: repeat(4, 1fr);
+                grid-template-columns: repeat(auto-fill, minmax(clamp(140px, 18%, 200px), 1fr));
             }
         }
 
@@ -870,13 +873,13 @@
             }
             
             .area-cards-grid {
-                grid-template-columns: repeat(3, 1fr);
+                grid-template-columns: repeat(auto-fill, minmax(clamp(130px, 25%, 180px), 1fr));
             }
         }
         
         @media (max-width: 480px) {
             .area-cards-grid {
-                grid-template-columns: repeat(2, 1fr);
+                grid-template-columns: repeat(auto-fill, minmax(clamp(120px, 40%, 160px), 1fr));
             }
         }
 
@@ -928,6 +931,15 @@
             transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1), transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
             transition: padding 0.2s ease;
+            width: 100%;
+            max-width: 100%;
+        }
+        
+        /* Map page needs specific height sizing */
+        #page-map {
+            height: 100%;
+            padding: 0;
+            overflow: hidden;
         }
 
         .page.fade-out {
@@ -1031,13 +1043,18 @@
         /* ============================================ */
         .area-performance-section {
             margin-bottom: var(--space-xl);
+            width: 100%;
+            max-width: 100%;
+            overflow: visible;
         }
 
         .area-cards-grid {
             display: grid;
-            grid-template-columns: repeat(6, 1fr);
+            grid-template-columns: repeat(auto-fill, minmax(clamp(160px, 20%, 220px), 1fr));
             gap: var(--space-lg);
             margin-bottom: var(--space-lg);
+            width: 100%;
+            max-width: 100%;
         }
 
         .area-card {
@@ -1567,7 +1584,7 @@
 
                 <!-- Charts Section -->
                 <!-- Charts Row 1 -->
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: var(--space-md); margin-bottom: var(--space-lg);">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr)); gap: var(--space-md); margin-bottom: var(--space-lg); width: 100%;">
                     <div class="chart-container">
                         <div class="chart-title">
                             <i class="fas fa-chart-line"></i>
@@ -1590,7 +1607,7 @@
                 </div>
 
                 <!-- Charts Row 2 - Donut Charts -->
-                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-md); margin-bottom: var(--space-lg); min-width: 0; overflow: hidden;">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(250px, 100%), 1fr)); gap: var(--space-md); margin-bottom: var(--space-lg); width: 100%; min-width: 0; overflow: hidden;">
                     <div class="chart-container">
                         <div class="chart-title">
                             <i class="fas fa-chart-pie"></i>
@@ -1623,7 +1640,7 @@
                 </div>
 
                 <!-- Charts Row 3 -->
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: var(--space-md); margin-bottom: var(--space-lg);">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr)); gap: var(--space-md); margin-bottom: var(--space-lg); width: 100%;">
                     <div class="chart-container">
                         <div class="chart-title">
                             <i class="fas fa-chart-bar"></i>
@@ -2228,7 +2245,7 @@
                         <input type="date" id="areaHistoryDate-${this.sanitizeId(sectionName)}" class="date-input" value="${formatDate(today)}" style="width: 100%; max-width: 200px;">
                     </div>
 
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(500px, 1fr)); gap: var(--space-lg); margin-bottom: var(--space-xl);">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr)); gap: var(--space-lg); margin-bottom: var(--space-xl); width: 100%;">
                         <div class="chart-container">
                             <div class="chart-title">
                                 <i class="fas fa-chart-line"></i>
@@ -4056,13 +4073,40 @@
              * Render interactive map
              */
             renderMap() {
+                const container = document.getElementById('svgContainer');
+                if (!container) {
+                    console.error('SVG container not found');
+                    return;
+                }
+                
+                // Show loading indicator
+                container.innerHTML = `
+                    <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 400px; color: var(--color-text-secondary);">
+                        <i class="fas fa-spinner fa-spin" style="font-size: 3rem; margin-bottom: 1rem; color: var(--color-primary);"></i>
+                        <p>Loading map...</p>
+                    </div>
+                `;
+                
                 fetch('map.svg')
-                    .then(response => response.text())
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
+                        return response.text();
+                    })
                     .then(svgText => {
-                        const container = document.getElementById('svgContainer');
+                        if (!svgText || svgText.trim() === '') {
+                            throw new Error('Empty SVG file');
+                        }
+                        
                         container.innerHTML = svgText;
                         const svg = container.querySelector('svg');
-                        if (!svg) return;
+                        
+                        if (!svg) {
+                            console.error('No SVG element found in map.svg');
+                            container.innerHTML = '<div style="display: flex; align-items: center; justify-content: center; height: 100%; color: var(--color-text-secondary);"><p>Map SVG could not be loaded</p></div>';
+                            return;
+                        }
 
                         // Add event listeners for vfd- and machine- elements
                         const vfds = svg.querySelectorAll('g[id^="vfd-"]');
@@ -4090,8 +4134,23 @@
                             machine.addEventListener('mouseleave', () => this.unhighlightPair(svg, machine.id));
                             machine.addEventListener('click', () => this.showEquipmentModal(machine.id));
                         });
+                        
+                        console.log('Map loaded successfully');
                     })
-                    .catch(error => console.error('Error loading SVG:', error));
+                    .catch(error => {
+                        console.error('Error loading SVG:', error);
+                        const container = document.getElementById('svgContainer');
+                        if (container) {
+                            container.innerHTML = `
+                                <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; min-height: 400px; color: var(--color-text-secondary); text-align: center; padding: 2rem;">
+                                    <i class="fas fa-exclamation-triangle" style="font-size: 3rem; margin-bottom: 1rem; color: var(--color-warning);"></i>
+                                    <h3 style="color: var(--color-text); margin-bottom: 0.5rem;">Map Could Not Be Loaded</h3>
+                                    <p>Error: ${error.message}</p>
+                                    <p style="font-size: 0.875rem; margin-top: 1rem;">Please ensure map.svg is accessible in the root directory.</p>
+                                </div>
+                            `;
+                        }
+                    });
             }
 
             /**
