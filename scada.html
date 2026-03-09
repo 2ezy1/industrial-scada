@@ -3924,11 +3924,10 @@
                 const pairId = id.startsWith('vfd-') ? `machine-${baseId}` : `vfd-${baseId}`;
                 const element = svg.querySelector(`#${id}`);
                 const pair = svg.querySelector(`#${pairId}`);
-                // subtle yellow glow
-                const glowVfd = 'drop-shadow(0 0 5px #fbbf24)';
-                const glowmachine = 'drop-shadow(0 0 20px #fbbf24)';
-                if (element) element.style.filter = glowVfd;
-                if (pair) pair.style.filter = glowmachine;
+                var shadowThickness1 = (id.startsWith('vfd-')) ? 10 : 30;
+                var shadowThickness2 = (id.startsWith('vfd-')) ? 30 : 10;
+                if (element) element.style.filter = 'drop-shadow(0 0 ' + shadowThickness1 + 'px red)';
+                if (pair) pair.style.filter = 'drop-shadow(0 0 ' + shadowThickness2 + 'px yellow)';
             }
 
             /**
