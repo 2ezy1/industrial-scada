@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -52,6 +52,9 @@
             --space-md: 0.5rem;
             --space-lg: 0.75rem;
             --space-xl: 1rem;
+
+            /* Layout */
+            --sidebar-width: 180px;
             
             /* Animation */
             --transition-fast: 0.15s ease;
@@ -145,10 +148,12 @@
         .container {
             display: flex;
             height: calc(100vh - 70px);
+            padding-left: 0;
+            transition: padding-left 0.35s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .sidebar {
-            width: 180px;
+            width: var(--sidebar-width);
             background-color: var(--color-surface);
             border-right: 1px solid var(--color-border);
             padding: var(--space-md) 0;
@@ -158,19 +163,19 @@
             top: 70px;
             height: calc(100vh - 70px);
             transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
-            transform: translateX(-180px);
+            transform: translateX(calc(-1 * var(--sidebar-width)));
             z-index: 100;
             box-shadow: 2px 0 12px rgba(0, 0, 0, 0.4);
         }
 
         .sidebar.active {
             transform: translateX(0);
-            box-shadow: 2px 0 20px rgba(14, 165, 233, 0.3);
+            box-shadow: 2px 0 12px rgba(0, 0, 0, 0.35);
         }
 
         .sidebar:hover {
             transform: translateX(0);
-            box-shadow: 2px 0 20px rgba(14, 165, 233, 0.3);
+            box-shadow: 2px 0 12px rgba(0, 0, 0, 0.35);
         }
 
         .container::before {
@@ -229,15 +234,69 @@
             border-left-color: var(--color-primary);
         }
 
+        
+
+        .sidebar-controls {
+            padding: var(--space-sm) var(--space-lg) var(--space-md);
+            border-bottom: 1px solid var(--color-border);
+            margin-bottom: var(--space-xs);
+        }
+
+        .sidebar-toggle-label {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: var(--space-md);
+            font-size: 0.75rem;
+            color: var(--color-text-secondary);
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .sidebar-toggle-label span {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .sidebar-toggle-label input {
+            accent-color: var(--color-primary);
+            cursor: pointer;
+        }
+
+        .sidebar.sidebar-locked {
+            transform: translateX(0);
+            box-shadow: 2px 0 12px rgba(0, 0, 0, 0.35);
+        }
+
+        .container.sidebar-no-autocollapse::before {
+            display: none;
+        }
+
+        .container.sidebar-no-autocollapse {
+            padding-left: var(--sidebar-width);
+        }
+
+        .container.sidebar-hover-open {
+            padding-left: var(--sidebar-width);
+        }
+
         /* ============================================ */
         /* MAIN CONTENT */
         /* ============================================ */
-        .main-content {
+         .main-content {
             flex: 1;
             overflow-y: auto;
+            overflow-x: hidden;
             background-color: var(--color-bg);
             padding: var(--space-md);
             position: relative;
+            transition: padding 0.2s ease;
+        }
+        
+        .main-content.map-active {
+            padding: 0;
+            overflow: hidden;
         }
 
         .page-header {
@@ -275,6 +334,7 @@
             flex: 1;
             min-width: 180px;
             position: relative;
+            transition: padding 0.2s ease;
         }
 
         .search-box input {
@@ -351,11 +411,12 @@
         /* ============================================ */
         .dashboard-grid {
             display: flex;
-            flex-wrap: nowrap;
+            flex-wrap: wrap;
             gap: var(--space-sm);
             margin-bottom: var(--space-md);
-            overflow-x: auto;
+            overflow-x: visible;
             padding-bottom: var(--space-xs);
+            width: 100%;
         }
 
         .card {
@@ -363,6 +424,8 @@
             border: 1px solid var(--color-border);
             border-radius: 0.75rem;
             padding: 0.5rem 0.75rem;
+            min-width: 160px;
+            flex: 1 1 auto;
             transition: all 0.3s ease;
             position: relative;
             overflow: hidden;
@@ -453,6 +516,7 @@
             border-radius: 0.75rem;
             padding: var(--space-md);
             margin-bottom: var(--space-lg);
+            min-width: 0;
         }
 
         .chart-title {
@@ -467,17 +531,33 @@
         .chart-wrapper {
             position: relative;
             height: 180px;
+            overflow: hidden;
         }
 
         /* map page container */
         .map-container {
             position: absolute;
-            top: -var(--space-md);
-            left: -var(--space-md);
-            width: calc(100% + 2*var(--space-md));
-            height: calc(100% + 2*var(--space-md));
-            overflow: auto;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow-y: auto;
+            overflow-x: hidden;
             background-color: var(--color-bg);
+        }
+
+        #svgContainer {
+            width: 100%;
+            min-height: calc(100vh - 70px);
+            height: 100%;
+        }
+
+        #svgContainer svg {
+            display: block;
+            width: 100%;
+            height: auto;
+            max-width: 100%;
+            min-height: 500px;
         }
 
         .fullscreen-btn {
@@ -730,18 +810,21 @@
             margin-bottom: var(--space-md);
             opacity: 0.5;
         }
-
         /* ============================================ */
         /* RESPONSIVE */
         /* ============================================ */
         @media (max-width: 1024px) {
-            .sidebar {
-                width: 200px;
+            :root {
+                --sidebar-width: 200px;
             }
 
             .dashboard-grid {
                 flex-wrap: wrap;
                 justify-content: flex-start;
+            }
+            
+            .area-cards-grid {
+                grid-template-columns: repeat(auto-fill, minmax(clamp(140px, 18%, 200px), 1fr));
             }
         }
 
@@ -757,6 +840,14 @@
                 border-bottom: 1px solid var(--color-border);
                 padding: var(--space-md) 0;
                 display: none;
+            }
+
+            .container.sidebar-no-autocollapse {
+                padding-left: 0;
+            }
+
+            .container.sidebar-hover-open {
+                padding-left: 0;
             }
 
             .sidebar.mobile-open {
@@ -786,6 +877,16 @@
 
             .card-value {
                 font-size: 1.75rem;
+            }
+            
+            .area-cards-grid {
+                grid-template-columns: repeat(auto-fill, minmax(clamp(130px, 25%, 180px), 1fr));
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .area-cards-grid {
+                grid-template-columns: repeat(auto-fill, minmax(clamp(120px, 40%, 160px), 1fr));
             }
         }
 
@@ -835,6 +936,18 @@
 
         .page {
             transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1), transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            transition: padding 0.2s ease;
+            width: 100%;
+            max-width: 100%;
+        }
+        
+        /* Map page needs specific height sizing */
+        #page-map {
+            min-height: calc(100vh - 70px);
+            height: 100%;
+            padding: 0;
+            overflow: hidden;
             position: relative;
         }
 
@@ -939,13 +1052,18 @@
         /* ============================================ */
         .area-performance-section {
             margin-bottom: var(--space-xl);
+            width: 100%;
+            max-width: 100%;
+            overflow: visible;
         }
 
         .area-cards-grid {
             display: grid;
-            grid-template-columns: repeat(6, 1fr);
+            grid-template-columns: repeat(auto-fill, minmax(clamp(160px, 20%, 220px), 1fr));
             gap: var(--space-lg);
             margin-bottom: var(--space-lg);
+            width: 100%;
+            max-width: 100%;
         }
 
         .area-card {
@@ -1394,6 +1512,12 @@
     <div class="container">
         <!-- SIDEBAR -->
         <aside class="sidebar" id="sidebar">
+            <div class="sidebar-controls">
+                <label class="sidebar-toggle-label" for="sidebarAutoCollapseToggle">
+                    <span><i class="fas fa-thumbtack"></i> Auto-collapse</span>
+                    <input type="checkbox" id="sidebarAutoCollapseToggle" checked>
+                </label>
+            </div>
             <div class="sidebar-section">
                 <div class="sidebar-title">Navigation</div>
                 <div class="sidebar-item active" data-page="overview">
@@ -1469,7 +1593,7 @@
 
                 <!-- Charts Section -->
                 <!-- Charts Row 1 -->
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: var(--space-md); margin-bottom: var(--space-lg);">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr)); gap: var(--space-md); margin-bottom: var(--space-lg); width: 100%;">
                     <div class="chart-container">
                         <div class="chart-title">
                             <i class="fas fa-chart-line"></i>
@@ -1492,7 +1616,7 @@
                 </div>
 
                 <!-- Charts Row 2 - Donut Charts -->
-                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-md); margin-bottom: var(--space-lg);">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(250px, 100%), 1fr)); gap: var(--space-md); margin-bottom: var(--space-lg); width: 100%; min-width: 0; overflow: hidden;">
                     <div class="chart-container">
                         <div class="chart-title">
                             <i class="fas fa-chart-pie"></i>
@@ -1525,7 +1649,7 @@
                 </div>
 
                 <!-- Charts Row 3 -->
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: var(--space-md); margin-bottom: var(--space-lg);">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr)); gap: var(--space-md); margin-bottom: var(--space-lg); width: 100%;">
                     <div class="chart-container">
                         <div class="chart-title">
                             <i class="fas fa-chart-bar"></i>
@@ -1673,7 +1797,7 @@
                 <button class="toggle-btn machine-toggle-btn" id="machineToggleBtn" title="Toggle Machine Visibility">
                     <i class="fas fa-cog"></i>
                 </button>
-                <button class="fullscreen-btn" id="fullscreenBtn" title="Toggle Fullscreen">⛶</button>
+                <button class="fullscreen-btn" id="fullscreenBtn" title="Toggle Fullscreen">?</button>
             </div>
         </main>
     </div>
@@ -1683,7 +1807,7 @@
         <div class="modal-content" style="max-width: 900px; max-height: 95vh; overflow-y: auto;">
             <div class="modal-header">
                 <h2 class="modal-title" id="detailsModalTitle">Equipment Details</h2>
-                <button class="modal-close" onclick="closeModal('detailsModal')">×</button>
+                <button class="modal-close" onclick="closeModal('detailsModal')">�</button>
             </div>
             <div class="modal-body" id="detailsModalBody"></div>
         </div>
@@ -1700,7 +1824,11 @@
                 this.data = null;
                 this.filteredData = null;
                 this.charts = {};
+                this.sidebarAutoCollapse = true;
                 this.vfdVisible = true;
+                this.chartResizeTimeout = null;
+                this.sidebarTransitioning = false;
+                this.sidebarTransitionTimeout = null;
                 this.machineVisible = true;
                 this.init();
             }
@@ -1711,9 +1839,70 @@
             async init() {
                 await this.loadData();
                 this.setupEventListeners();
+                this.initializeSidebarPreference();
                 this.renderSidebar();
                 this.initializeDateInputs();
                 this.loadPage('overview');
+            }
+            /**
+             * Initialize sidebar auto-collapse preference
+             */
+            initializeSidebarPreference() {
+                const savedPreference = localStorage.getItem('scada.sidebar.autoCollapse');
+                if (savedPreference !== null) {
+                    this.sidebarAutoCollapse = savedPreference === 'true';
+                }
+
+                const toggle = document.getElementById('sidebarAutoCollapseToggle');
+                if (toggle) {
+                    toggle.checked = this.sidebarAutoCollapse;
+                }
+
+                this.applySidebarMode();
+            }
+
+            /**
+             * Apply sidebar behavior based on auto-collapse mode
+             */
+            applySidebarMode() {
+                const sidebar = document.getElementById('sidebar');
+                const container = document.querySelector('.container');
+                if (!sidebar || !container) return;
+
+                const isPinned = !this.sidebarAutoCollapse;
+                sidebar.classList.toggle('sidebar-locked', isPinned);
+                container.classList.toggle('sidebar-no-autocollapse', isPinned);
+                container.classList.remove('sidebar-hover-open');
+
+                if (isPinned) {
+                    sidebar.classList.add('active');
+                    this.sidebarTransitioning = false;
+                    clearTimeout(this.sidebarTransitionTimeout);
+                } else {
+                    sidebar.classList.remove('active');
+                    // Block hover re-trigger while sidebar is transitioning out
+                    this.sidebarTransitioning = true;
+                    clearTimeout(this.sidebarTransitionTimeout);
+                    this.sidebarTransitionTimeout = setTimeout(() => {
+                        this.sidebarTransitioning = false;
+                    }, 420);
+                }
+
+                this.scheduleChartResize();
+            }
+
+            /**
+             * Debounced chart resize for sidebar transitions
+             */
+            scheduleChartResize() {
+                clearTimeout(this.chartResizeTimeout);
+                this.chartResizeTimeout = setTimeout(() => {
+                    Object.values(this.charts).forEach(chart => {
+                        if (chart && typeof chart.resize === 'function') {
+                            chart.resize();
+                        }
+                    });
+                }, 380);
             }
 
             /**
@@ -1814,6 +2003,15 @@
                 }
 
                 
+                const sidebarAutoCollapseToggle = document.getElementById('sidebarAutoCollapseToggle');
+                if (sidebarAutoCollapseToggle) {
+                    sidebarAutoCollapseToggle.addEventListener('change', (e) => {
+                        this.sidebarAutoCollapse = e.currentTarget.checked;
+                        localStorage.setItem('scada.sidebar.autoCollapse', String(this.sidebarAutoCollapse));
+                        this.applySidebarMode();
+                    });
+                }
+
                 this.setupSidebarTrigger();
             }
 
@@ -1822,35 +2020,49 @@
              */
             setupSidebarTrigger() {
                 const sidebar = document.querySelector('.sidebar');
+                const container = document.querySelector('.container');
                 if (!sidebar) return;
 
                 let sidebarTimeout;
 
                 document.addEventListener('mousemove', (e) => {
+                    if (!this.sidebarAutoCollapse) return;
+                    if (this.sidebarTransitioning) return;
+
                     clearTimeout(sidebarTimeout);
-                    
-                    // Show sidebar if cursor is within 35px of left edge
+
                     if (e.clientX < 35) {
                         sidebar.classList.add('active');
+                        if (container) container.classList.add('sidebar-hover-open');
+                        this.scheduleChartResize();
                     } else if (!sidebar.matches(':hover')) {
-                        // Hide sidebar if away from left edge and not hovering sidebar
                         sidebarTimeout = setTimeout(() => {
                             if (!sidebar.matches(':hover')) {
                                 sidebar.classList.remove('active');
+                                if (container) container.classList.remove('sidebar-hover-open');
+                                this.scheduleChartResize();
                             }
                         }, 100);
                     }
                 });
 
-                // Keep sidebar visible while hovering it
                 sidebar.addEventListener('mouseenter', () => {
+                    if (!this.sidebarAutoCollapse) return;
+                    if (this.sidebarTransitioning) return;
+
                     clearTimeout(sidebarTimeout);
                     sidebar.classList.add('active');
+                    if (container) container.classList.add('sidebar-hover-open');
+                        this.scheduleChartResize();
                 });
 
                 sidebar.addEventListener('mouseleave', () => {
+                    if (!this.sidebarAutoCollapse) return;
+
                     sidebarTimeout = setTimeout(() => {
                         sidebar.classList.remove('active');
+                        if (container) container.classList.remove('sidebar-hover-open');
+                                this.scheduleChartResize();
                     }, 200);
                 });
             }
@@ -1919,10 +2131,9 @@
                 // Animate out all existing pages (except map)
                 const pages = document.querySelectorAll('.page');
                 pages.forEach(page => {
-                    if (page.id !== 'page-map') {
                         page.classList.add('fade-out');
                         page.classList.remove('fade-in');
-                    }
+                    
                 });
 
                 // After fade out, hide all pages and show selected
@@ -1932,12 +2143,21 @@
                     });
 
                     const selectedPage = document.getElementById(`page-${pageName}`);
+                    const mainContent = document.getElementById('mainContent');
+                    
                     if (selectedPage) {
                         selectedPage.style.display = 'block';
                         // Trigger fade in animation (except for map)
-                        if (pageName !== 'map') {
+                        
                             selectedPage.classList.remove('fade-out');
                             selectedPage.classList.add('fade-in');
+                        
+                        
+                        // Remove padding from main-content when showing map
+                        if (pageName === 'map') {
+                            if (mainContent) mainContent.classList.add('map-active');
+                        } else {
+                            if (mainContent) mainContent.classList.remove('map-active');
                         }
                     }
 
@@ -1955,6 +2175,11 @@
                     } else if (pageName === 'map') {
                         this.renderMap();
                     }
+                    
+                    // Schedule chart resize to ensure proper display after page load
+                    setTimeout(() => {
+                        this.scheduleChartResize();
+                    }, 100);
                 }, 200);
             }
 
@@ -1965,19 +2190,27 @@
                 const section = this.data.sections.find(s => s.name === sectionName);
                 if (!section) return;
 
-                // Hide all pages
-                document.querySelectorAll('.page').forEach(page => {
-                    page.style.display = 'none';
+                // Animate out all existing pages
+                const pages = document.querySelectorAll('.page');
+                pages.forEach(page => {
+                    page.classList.add('fade-out');
+                    page.classList.remove('fade-in');
                 });
 
-                // Create dynamic section page if not exists
-                let sectionPage = document.getElementById(`page-section-${this.sanitizeId(sectionName)}`);
-                if (!sectionPage) {
-                    sectionPage = document.createElement('div');
-                    sectionPage.id = `page-section-${this.sanitizeId(sectionName)}`;
-                    sectionPage.className = 'page';
-                    document.getElementById('mainContent').appendChild(sectionPage);
-                }
+                // After fade out, hide all pages and show selected
+                setTimeout(() => {
+                    pages.forEach(page => {
+                        page.style.display = 'none';
+                    });
+
+                    // Create dynamic section page if not exists
+                    let sectionPage = document.getElementById(`page-section-${this.sanitizeId(sectionName)}`);
+                    if (!sectionPage) {
+                        sectionPage = document.createElement('div');
+                        sectionPage.id = `page-section-${this.sanitizeId(sectionName)}`;
+                        sectionPage.className = 'page';
+                        document.getElementById('mainContent').appendChild(sectionPage);
+                    }
 
                 // Render section content
                 const today = new Date();
@@ -2029,7 +2262,7 @@
                         <input type="date" id="areaHistoryDate-${this.sanitizeId(sectionName)}" class="date-input" value="${formatDate(today)}" style="width: 100%; max-width: 200px;">
                     </div>
 
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(500px, 1fr)); gap: var(--space-lg); margin-bottom: var(--space-xl);">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr)); gap: var(--space-lg); margin-bottom: var(--space-xl); width: 100%;">
                         <div class="chart-container">
                             <div class="chart-title">
                                 <i class="fas fa-chart-line"></i>
@@ -2115,32 +2348,40 @@
                     </div>
                 `;
 
-                sectionPage.innerHTML = html;
-                sectionPage.style.display = 'block';
+                    sectionPage.innerHTML = html;
+                    sectionPage.style.display = 'block';
+                    
+                    // Trigger fade in animation
+                    sectionPage.classList.remove('fade-out');
+                    sectionPage.classList.add('fade-in');
 
-                // Update sidebar active state
-                document.querySelectorAll('.sidebar-item').forEach(item => {
-                    item.classList.remove('active');
-                });
-                document.querySelector(`[data-section="${sectionName}"]`)?.classList.add('active');
+                    // Update sidebar active state
+                    document.querySelectorAll('.sidebar-item').forEach(item => {
+                        item.classList.remove('active');
+                    });
+                    document.querySelector(`[data-section="${sectionName}"]`)?.classList.add('active');
 
-                // Render charts after page is displayed
-                setTimeout(() => {
-                    this.renderAreaRunningTimeChart(section);
-                    this.renderAreaPowerConsumptionChart(section);
-                    this.renderAreaFrequencyChart(section);
-                    this.renderSectionFaults(section);
+                    // Render charts after page is displayed
+                    setTimeout(() => {
+                        this.renderAreaRunningTimeChart(section);
+                        this.renderAreaPowerConsumptionChart(section);
+                        this.renderAreaFrequencyChart(section);
+                        this.renderSectionFaults(section);
 
-                    // Add date change listeners
-                    const dateInput = document.getElementById(`areaHistoryDate-${this.sanitizeId(sectionName)}`);
-                    if (dateInput) {
-                        dateInput.addEventListener('change', () => {
-                            this.renderAreaRunningTimeChart(section);
-                            this.renderAreaPowerConsumptionChart(section);
-                            this.renderAreaFrequencyChart(section);
-                        });
-                    }
-                }, 100);
+                        // Add date change listeners
+                        const dateInput = document.getElementById(`areaHistoryDate-${this.sanitizeId(sectionName)}`);
+                        if (dateInput) {
+                            dateInput.addEventListener('change', () => {
+                                this.renderAreaRunningTimeChart(section);
+                                this.renderAreaPowerConsumptionChart(section);
+                                this.renderAreaFrequencyChart(section);
+                            });
+                        }
+                        
+                        // Schedule chart resize to ensure proper display
+                        this.scheduleChartResize();
+                    }, 150);
+                }, 200);
             }
 
             /**
@@ -3178,11 +3419,11 @@
                 const voltage = parseFloat(equipment.voltage) || 380;
 
                 // Generate realistic live data based on equipment specifications
-                const referenceFrequency = (50 + (Math.random() * 2 - 1)).toFixed(2); // 50 ± 1 Hz
+                const referenceFrequency = (50 + (Math.random() * 2 - 1)).toFixed(2); // 50 � 1 Hz
                 const outputFrequency = (45 + Math.random() * 10).toFixed(2); // 45-55 Hz
                 const outputCurrent = (power * 1.732 * 0.6 / voltage * (0.8 + Math.random() * 0.4)).toFixed(2); // A
                 const dcBusVoltage = (voltage * 1.45 + (Math.random() * 30 - 15)).toFixed(1); // DC voltage
-                const outputTorque = (power * 7.355 * (0.7 + Math.random() * 0.3)).toFixed(2); // N·m
+                const outputTorque = (power * 7.355 * (0.7 + Math.random() * 0.3)).toFixed(2); // N�m
                 const outputPower = (power * 0.746 * (0.7 + Math.random() * 0.3)).toFixed(2); // kW
 
                 return {
@@ -3274,7 +3515,7 @@
                             <div style="background: linear-gradient(135deg, var(--color-card) 0%, var(--color-surface) 100%); border: 1px solid var(--color-border); border-radius: 0.5rem; padding: var(--space-lg); text-align: center; transition: all 0.3s ease;" onmouseover="this.style.borderColor='var(--color-primary)'" onmouseout="this.style.borderColor='var(--color-border)'">
                                 <div style="font-size: 0.75rem; color: var(--color-text-secondary); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: var(--space-sm); font-weight: 600;">Output Torque</div>
                                 <div style="font-size: 1.5rem; font-weight: 700; color: var(--color-primary); font-family: var(--font-mono);">${livePerformance.outputTorque}</div>
-                                <div style="font-size: 0.75rem; color: var(--color-text-secondary); margin-top: var(--space-xs);">N·m</div>
+                                <div style="font-size: 0.75rem; color: var(--color-text-secondary); margin-top: var(--space-xs);">N�m</div>
                             </div>
                             <div style="background: linear-gradient(135deg, var(--color-card) 0%, var(--color-surface) 100%); border: 1px solid var(--color-border); border-radius: 0.5rem; padding: var(--space-lg); text-align: center; transition: all 0.3s ease;" onmouseover="this.style.borderColor='var(--color-primary)'" onmouseout="this.style.borderColor='var(--color-border)'">
                                 <div style="font-size: 0.75rem; color: var(--color-text-secondary); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: var(--space-sm); font-weight: 600;">Output Power</div>
@@ -3849,13 +4090,48 @@
              * Render interactive map
              */
             renderMap() {
-                fetch('map.svg')
-                    .then(response => response.text())
-                    .then(svgText => {
-                        const container = document.getElementById('svgContainer');
+                const container = document.getElementById('svgContainer');
+                if (!container) {
+                    console.error('SVG container not found');
+                    return;
+                }
+                
+                // Show loading indicator
+                container.innerHTML = `
+                    <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 400px; color: var(--color-text-secondary);">
+                        <i class="fas fa-spinner fa-spin" style="font-size: 3rem; margin-bottom: 1rem; color: var(--color-primary);"></i>
+                        <p>Loading map...</p>
+                    </div>
+                `;
+                
+                // Use XMLHttpRequest instead of fetch for better file:// protocol support
+                const xhr = new XMLHttpRequest();
+                xhr.open('GET', 'map.svg', true);
+                xhr.overrideMimeType('image/svg+xml');
+                
+                xhr.onload = () => {
+                    if (xhr.status === 200 || xhr.status === 0) { // 0 for file:// protocol
+                        const svgText = xhr.responseText;
+                        
+                        if (!svgText || svgText.trim() === '') {
+                            container.innerHTML = `
+                                <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; min-height: 400px; color: var(--color-text-secondary); text-align: center; padding: 2rem;">
+                                    <i class="fas fa-exclamation-triangle" style="font-size: 3rem; margin-bottom: 1rem; color: var(--color-warning);"></i>
+                                    <h3 style="color: var(--color-text); margin-bottom: 0.5rem;">Empty SVG File</h3>
+                                    <p>The map.svg file appears to be empty.</p>
+                                </div>
+                            `;
+                            return;
+                        }
+                        
                         container.innerHTML = svgText;
                         const svg = container.querySelector('svg');
-                        if (!svg) return;
+                        
+                        if (!svg) {
+                            console.error('No SVG element found in map.svg');
+                            container.innerHTML = '<div style="display: flex; align-items: center; justify-content: center; height: 100%; color: var(--color-text-secondary);"><p>Map SVG could not be loaded</p></div>';
+                            return;
+                        }
 
                         // Add event listeners for vfd- and machine- elements
                         const vfds = svg.querySelectorAll('g[id^="vfd-"]');
@@ -3883,11 +4159,26 @@
                             machine.addEventListener('mouseleave', () => this.unhighlightPair(svg, machine.id));
                             machine.addEventListener('click', () => this.showEquipmentModal(machine.id));
                         });
-
-                        // Initialize toggle button states
-                        this.updateToggleButtons();
-                    })
-                    .catch(error => console.error('Error loading SVG:', error));
+                        
+                        console.log('Map loaded successfully');
+                    } else {
+                        throw new Error(`Failed to load map.svg (status: ${xhr.status})`);
+                    }
+                };
+                
+                xhr.onerror = () => {
+                    console.error('Error loading SVG via XMLHttpRequest');
+                    container.innerHTML = `
+                        <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; min-height: 400px; color: var(--color-text-secondary); text-align: center; padding: 2rem;">
+                            <i class="fas fa-exclamation-triangle" style="font-size: 3rem; margin-bottom: 1rem; color: var(--color-warning);"></i>
+                            <h3 style="color: var(--color-text); margin-bottom: 0.5rem;">Map Could Not Be Loaded</h3>
+                            <p>Error loading map.svg</p>
+                            <p style="font-size: 0.875rem; margin-top: 1rem;">Please ensure map.svg is in the same directory as scada.html</p>
+                        </div>
+                    `;
+                };
+                
+                xhr.send();
             }
 
             /**
@@ -4003,7 +4294,7 @@
                         </div>
                         <div class="tooltip-item">
                             <div class="tooltip-label">Output Torque</div>
-                            <div class="tooltip-value">${liveData.outputTorque}<span class="tooltip-unit">N·m</span></div>
+                            <div class="tooltip-value">${liveData.outputTorque}<span class="tooltip-unit">N�m</span></div>
                         </div>
                         <div class="tooltip-item">
                             <div class="tooltip-label">Reference Freq</div>
@@ -4160,3 +4451,40 @@
     </script>
 </body>
 </html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
