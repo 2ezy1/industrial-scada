@@ -2131,10 +2131,9 @@
                 // Animate out all existing pages (except map)
                 const pages = document.querySelectorAll('.page');
                 pages.forEach(page => {
-                    if (page.id !== 'page-map') {
                         page.classList.add('fade-out');
                         page.classList.remove('fade-in');
-                    }
+                    
                 });
 
                 // After fade out, hide all pages and show selected
@@ -2149,10 +2148,10 @@
                     if (selectedPage) {
                         selectedPage.style.display = 'block';
                         // Trigger fade in animation (except for map)
-                        if (pageName !== 'map') {
+                        
                             selectedPage.classList.remove('fade-out');
                             selectedPage.classList.add('fade-in');
-                        }
+                        
                         
                         // Remove padding from main-content when showing map
                         if (pageName === 'map') {
