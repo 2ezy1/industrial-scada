@@ -437,6 +437,32 @@
             max-width: 500px;
         }
 
+        /* Keep overview KPI cards in a single horizontal row on wide screens. */
+        #kpiCards {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 0.9rem;
+            width: 100%;
+            align-items: stretch;
+        }
+
+        #kpiCards > .card {
+            max-width: 100%;
+            min-width: 0;
+        }
+
+        #kpiCards .card-value {
+            font-size: clamp(1.7rem, 2.5vw, 2.2rem);
+        }
+
+        #kpiCards .card-title {
+            font-size: 0.95rem;
+        }
+
+        #kpiCards .card-subtitle {
+            font-size: 0.8rem;
+        }
+
         #powerPanelsGrid {
             display: grid;
                         grid-template-columns: repeat(var(--panel-count, 1), minmax(0, 1fr));
@@ -1518,6 +1544,11 @@
                 --sidebar-width: 200px;
             }
 
+            #kpiCards {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 0.75rem;
+            }
+
             .dashboard-grid > * {
                 flex: 1 1 250px;
                 max-width: 400px;
@@ -1573,6 +1604,11 @@
         @media (max-width: 768px) {
             .container {
                 flex-direction: column;
+            }
+
+            #kpiCards {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 0.6rem;
             }
 
             .sidebar {
@@ -1728,6 +1764,11 @@
         @media (max-width: 480px) {
             .area-cards-grid {
                 grid-template-columns: repeat(auto-fill, minmax(clamp(120px, 40%, 160px), 1fr));
+            }
+
+            #kpiCards {
+                grid-template-columns: 1fr;
+                gap: 0.45rem;
             }
 
             #page-equipment .page-header {
