@@ -538,6 +538,18 @@
             font-size: 0.85rem;
         }
 
+        .chart-title .title-label {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .btn-view-all {
+            padding: 0.28rem 0.55rem;
+            font-size: 0.72rem;
+            line-height: 1.1;
+            white-space: nowrap;
+        }
+
         .chart-wrapper {
             position: relative;
             height: 180px;
@@ -3179,8 +3191,8 @@
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr)); gap: var(--space-lg); margin-bottom: var(--space-xl); width: 100%;">
                         <div class="chart-container">
                             <div class="chart-title">
-                                <i class="fas fa-chart-line"></i>
-                                Running Time (Last 7 Days) - All Equipment
+                                <span class="title-label"><i class="fas fa-chart-line"></i> Running Time (Last 7 Days) - All Equipment</span>
+                                <button class="btn btn-secondary btn-view-all" onclick="dashboard.showAllChartDatasetsById('areaRunningTimeChart-${this.sanitizeId(sectionName)}')">View All</button>
                             </div>
                             <div class="chart-wrapper">
                                 <canvas id="areaRunningTimeChart-${this.sanitizeId(sectionName)}"></canvas>
@@ -3189,8 +3201,8 @@
 
                         <div class="chart-container">
                             <div class="chart-title">
-                                <i class="fas fa-chart-line"></i>
-                                Power Consumption (Last 7 Days) - All Equipment
+                                <span class="title-label"><i class="fas fa-chart-line"></i> Power Consumption (Last 7 Days) - All Equipment</span>
+                                <button class="btn btn-secondary btn-view-all" onclick="dashboard.showAllChartDatasetsById('areaPowerConsumptionChart-${this.sanitizeId(sectionName)}')">View All</button>
                             </div>
                             <div class="chart-wrapper">
                                 <canvas id="areaPowerConsumptionChart-${this.sanitizeId(sectionName)}"></canvas>
@@ -3200,8 +3212,8 @@
 
                     <div class="chart-container">
                         <div class="chart-title">
-                            <i class="fas fa-chart-line"></i>
-                            Daily Frequency History - All Equipment
+                            <span class="title-label"><i class="fas fa-chart-line"></i> Daily Frequency History - All Equipment</span>
+                            <button class="btn btn-secondary btn-view-all" onclick="dashboard.showAllChartDatasetsById('areaFrequencyChart-${this.sanitizeId(sectionName)}')">View All</button>
                         </div>
                         <div class="chart-wrapper">
                             <canvas id="areaFrequencyChart-${this.sanitizeId(sectionName)}"></canvas>
@@ -3320,6 +3332,67 @@
                     this.renderAreaFrequencyChart(section);
                 }
             }
+
+            /**
+             * Reset a multi-dataset chart to show all datasets
+             */
+            showAllChartDatasetsById(canvasId) {
+                const chart = this.charts[canvasId];
+                if (!chart) return;
+
+                chart.data.datasets.forEach((_, idx) => {
+                    chart.setDatasetVisibility(idx, true);
+                });
+                chart.update();
+            }
+
+            /**
+             * Legend click behavior:
+             * - If all datasets are visible, first click isolates one dataset.
+             * - After isolation, next clicks can add/remove datasets (multi-select).
+             */
+            applyLegendSelectionBehavior(chart) {
+                if (!chart?.options?.plugins?.legend) return;
+
+                chart.options.plugins.legend.onClick = (_event, legendItem, legend) => {
+                    const targetIndex = legendItem.datasetIndex;
+                    if (typeof targetIndex !== 'number') return;
+
+                    const chartRef = legend.chart;
+                    const total = chartRef.data.datasets.length;
+                    const visibleIndexes = [];
+
+                    chartRef.data.datasets.forEach((_, idx) => {
+                        if (chartRef.isDatasetVisible(idx)) {
+                            visibleIndexes.push(idx);
+                        }
+                    });
+
+                    const allVisible = visibleIndexes.length === total;
+                    const targetVisible = chartRef.isDatasetVisible(targetIndex);
+
+                    if (allVisible) {
+                        // First click from default state: isolate selected dataset.
+                        chartRef.data.datasets.forEach((_, idx) => {
+                            chartRef.setDatasetVisibility(idx, idx === targetIndex);
+                        });
+                        chartRef.update();
+                        return;
+                    }
+
+                    // In selection mode, toggle clicked dataset for multi-select.
+                    if (targetVisible) {
+                        // Keep at least one visible to avoid empty chart state.
+                        if (visibleIndexes.length > 1) {
+                            chartRef.setDatasetVisibility(targetIndex, false);
+                        }
+                    } else {
+                        chartRef.setDatasetVisibility(targetIndex, true);
+                    }
+
+                    chartRef.update();
+                };
+            }
             renderAreaRunningTimeChart(section) {
                 const canvasId = `areaRunningTimeChart-${this.sanitizeId(section.name)}`;
                 const canvas = document.getElementById(canvasId);
@@ -3375,6 +3448,8 @@
                         }
                     }
                 });
+
+                this.applyLegendSelectionBehavior(this.charts[canvasId]);
             }
 
             /**
@@ -3436,6 +3511,8 @@
                         }
                     }
                 });
+
+                this.applyLegendSelectionBehavior(this.charts[canvasId]);
             }
 
             /**
@@ -3497,6 +3574,8 @@
                         }
                     }
                 });
+
+                this.applyLegendSelectionBehavior(this.charts[canvasId]);
             }
 
             /**
