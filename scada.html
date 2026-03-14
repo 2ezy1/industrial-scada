@@ -64,6 +64,7 @@
             /* Fluid Typography & Scaling */
             /* Scales from 12px (small mobile) to 16px (desktop) based on viewport width */
             --base-font-size: clamp(12px, 2.5vw, 16px);
+            --font-scale: 1;
             /* Header scales from 60px to 90px */
             --header-height: clamp(50px, 8vh, 90px);
         }
@@ -76,7 +77,7 @@
             line-height: 1.6;
             overflow-x: hidden;
             transition: var(--transition-base);
-            font-size: var(--base-font-size);
+            font-size: calc(var(--base-font-size) * var(--font-scale));
         }
 
         /* ============================================ */
@@ -158,7 +159,9 @@
         .container {
             display: flex;
             height: calc(100vh - var(--header-height));
+            min-height: 0;
             padding-left: 0;
+            min-width: 0;
             transition: padding-left 0.35s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
@@ -168,7 +171,11 @@
             border-right: 1px solid var(--color-border);
             padding: var(--space-md) 0;
             overflow-y: auto;
+            overflow-x: hidden;
             -webkit-overflow-scrolling: touch;
+            overscroll-behavior: contain;
+            touch-action: pan-y;
+            scrollbar-gutter: stable;
             position: fixed;
             left: 0;
             top: var(--header-height);
@@ -297,6 +304,8 @@
         /* ============================================ */
          .main-content {
             flex: 1;
+                min-width: 0;
+            min-height: 0;
             overflow-y: auto;
             overflow-x: hidden;
             -webkit-overflow-scrolling: touch;
@@ -758,8 +767,9 @@
 
         .area-summary-table {
             width: 100%;
-            min-width: 760px;
+            min-width: 0;
             border-collapse: collapse;
+            table-layout: fixed;
         }
 
         .area-summary-table th,
@@ -809,13 +819,59 @@
         #areaPerformanceTable {
             width: 100%;
             border-collapse: collapse;
+            table-layout: fixed;
+            min-width: 0;
         }
 
         #areaPerformanceTable th,
         #areaPerformanceTable td {
-            padding: var(--space-md);
+            padding: clamp(0.35rem, 1vw, 0.55rem) clamp(0.4rem, 1.1vw, 0.7rem);
             text-align: left;
             border-bottom: 1px solid var(--color-border);
+            vertical-align: middle;
+            overflow: visible;
+            text-overflow: clip;
+            white-space: normal;
+            overflow-wrap: anywhere;
+            word-break: break-word;
+            line-height: 1.35;
+        }
+
+        #areaPerformanceTable th:nth-child(1),
+        #areaPerformanceTable td:nth-child(1) {
+            width: 16%;
+        }
+
+        #areaPerformanceTable th:nth-child(2),
+        #areaPerformanceTable td:nth-child(2) {
+            width: 22%;
+        }
+
+        #areaPerformanceTable th:nth-child(3),
+        #areaPerformanceTable td:nth-child(3) {
+            width: 14%;
+        }
+
+        #areaPerformanceTable th:nth-child(n+4),
+        #areaPerformanceTable td:nth-child(n+4) {
+            width: 6%;
+        }
+
+        .area-name-cell {
+            white-space: normal;
+            overflow-wrap: anywhere;
+            font-weight: 600;
+        }
+
+        #areaPerformanceTable .status-summary {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.18rem;
+        }
+
+        #areaPerformanceTable .status-pill {
+            font-size: 0.66rem;
+            padding: 0.1rem 0.24rem;
         }
 
         #areaPerformanceTable th {
@@ -884,9 +940,18 @@
             text-align: center;
         }
         .panel-areas {
-            font-size: 0.75rem;
-            color: rgba(255, 255, 255, 0.5);
-            display: none;
+            display: block;
+            font-size: 0.68rem;
+            color: rgba(191, 219, 254, 0.92);
+            text-align: center;
+            margin-top: 0.2rem;
+            padding: 0.2rem 0.45rem;
+            border-radius: 999px;
+            border: 1px solid rgba(59, 130, 246, 0.32);
+            background: rgba(30, 64, 175, 0.18);
+            white-space: normal;
+            word-break: break-word;
+            line-height: 1.25;
         }
 
         .phase-display {
@@ -1070,10 +1135,12 @@
         }
 
         .equipment-names-cell {
-            max-width: 200px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
+            max-width: none;
+            overflow: visible;
+            text-overflow: clip;
+            white-space: normal;
+            overflow-wrap: anywhere;
+            word-break: break-word;
             color: var(--color-text-secondary);
             font-size: 0.85rem;
         }
@@ -1248,16 +1315,20 @@
             flex-direction: column;
             align-items: stretch;
             gap: var(--space-md);
+            width: 100%;
+            min-width: 0;
         }
 
         #page-equipment .page-header {
-            width: -webkit-fill-available;
-            margin: 10px;
+            width: 100%;
+            max-width: 100%;
+            margin: 0;
             display: flex;
             align-items: center;
             justify-content: space-between;
             gap: var(--space-md);
             flex-wrap: nowrap;
+            min-width: 0;
         }
 
         #page-equipment .equipment-header-text {
@@ -1280,7 +1351,7 @@
 
         #page-equipment .controls-bar {
             width: fit-content;
-            max-width: -webkit-fill-available;
+            max-width: 100%;
             margin: 0 0 0 auto;
             display: flex;
             flex-wrap: nowrap;
@@ -1291,6 +1362,7 @@
             border: none;
             background: transparent;
             box-shadow: none;
+            min-width: 0;
         }
 
         #page-equipment .search-box {
@@ -1307,13 +1379,15 @@
         }
 
         #page-equipment .table-container {
-            width: -webkit-fill-available;
-            margin: 10px;
-            overflow-x: auto;
+            width: 100%;
+            max-width: 100%;
+            margin: 0;
+            overflow-x: hidden;
             border-radius: 1rem;
             border: 1px solid rgba(148, 163, 184, 0.28);
             background: linear-gradient(180deg, rgba(30, 41, 59, 0.74), rgba(15, 23, 42, 0.95));
             box-shadow: 0 14px 36px rgba(2, 6, 23, 0.36), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+            min-width: 0;
         }
 
         #page-equipment .table-header {
@@ -1324,8 +1398,9 @@
         }
 
         #equipmentTable {
-            width: max-content;
-            min-width: 100%;
+            width: 100%;
+            min-width: 0;
+            table-layout: fixed;
         }
 
         #page-equipment th {
@@ -1395,6 +1470,51 @@
             transform: translateY(-1px);
             border-color: rgba(14, 165, 233, 0.7);
             box-shadow: 0 6px 14px rgba(14, 165, 233, 0.25);
+        }
+
+        /* Compact equipment table when sidebar is expanded to avoid clipped columns. */
+        .container.sidebar-no-autocollapse #equipmentTable,
+        .container.sidebar-hover-open #equipmentTable {
+            width: 100%;
+            min-width: 100%;
+            table-layout: fixed;
+        }
+
+        .container.sidebar-no-autocollapse #page-equipment th,
+        .container.sidebar-no-autocollapse #page-equipment td,
+        .container.sidebar-hover-open #page-equipment th,
+        .container.sidebar-hover-open #page-equipment td {
+            padding: 0.38rem 0.28rem;
+            font-size: 0.82rem;
+            white-space: normal;
+            overflow: visible;
+            text-overflow: clip;
+            overflow-wrap: anywhere;
+            word-break: break-word;
+        }
+
+        .container.sidebar-no-autocollapse #page-equipment .equipment-name-cell,
+        .container.sidebar-hover-open #page-equipment .equipment-name-cell {
+            min-width: 0;
+            width: 9%;
+        }
+
+        .container.sidebar-no-autocollapse #page-equipment .downtime-cell,
+        .container.sidebar-hover-open #page-equipment .downtime-cell {
+            min-width: 0;
+            width: 10%;
+            font-size: 0.8rem;
+        }
+
+        .container.sidebar-no-autocollapse #page-equipment .downtime-content,
+        .container.sidebar-hover-open #page-equipment .downtime-content {
+            gap: 6px;
+        }
+
+        .container.sidebar-no-autocollapse #page-equipment .downtime-history-btn,
+        .container.sidebar-hover-open #page-equipment .downtime-history-btn {
+            padding: 0.25rem 0.45rem !important;
+            font-size: 0.66rem;
         }
 
         /* ============================================ */
@@ -3262,6 +3382,68 @@
         .floating-btn.hidden .toggle-text {
             color: white;
         }
+
+        /* Disable horizontal swipe and keep content visible via wrapping. */
+        #areaPerformanceTable {
+            table-layout: fixed;
+            min-width: 0;
+        }
+
+        #areaPerformanceTable th,
+        #areaPerformanceTable td,
+        .area-name-cell,
+        .equipment-names-cell,
+        #page-equipment th,
+        #page-equipment td,
+        #page-equipment .equipment-name-cell,
+        #page-equipment .downtime-cell,
+        .status-pill,
+        .tag,
+        .sidebar-item {
+            white-space: normal !important;
+            overflow-wrap: anywhere !important;
+            word-break: break-word !important;
+            text-overflow: unset !important;
+        }
+
+        #page-equipment .table-container,
+        .area-summary-content {
+            overflow-x: hidden;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        #equipmentTable {
+            width: 100%;
+            min-width: 0;
+        }
+
+        .container.sidebar-no-autocollapse #equipmentTable,
+        .container.sidebar-hover-open #equipmentTable {
+            width: 100%;
+            min-width: 0;
+            table-layout: fixed;
+        }
+
+        .container.sidebar-no-autocollapse #page-equipment th,
+        .container.sidebar-no-autocollapse #page-equipment td,
+        .container.sidebar-hover-open #page-equipment th,
+        .container.sidebar-hover-open #page-equipment td {
+            white-space: normal !important;
+            overflow: visible !important;
+            text-overflow: unset !important;
+            overflow-wrap: anywhere !important;
+            word-break: break-word !important;
+        }
+
+        .chart-title {
+            flex-wrap: wrap;
+            overflow-x: hidden;
+            scrollbar-width: thin;
+        }
+
+        .chart-title .title-label {
+            white-space: normal;
+        }
     </style>
 </head>
 <body>
@@ -3397,8 +3579,8 @@
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr)); gap: var(--space-md); margin-bottom: var(--space-lg); width: 100%;">
                     <div class="chart-container">
                         <div class="chart-title">
-                            <i class="fas fa-chart-line"></i>
-                            Total Power Consumption Per Area (Daily)
+                            <span class="title-label"><i class="fas fa-chart-line"></i> Total Power Consumption Per Area (Daily)</span>
+                            <button class="btn btn-secondary btn-view-all" onclick="dashboard.showAllChartDatasetsById('powerConsumptionLineChart')">View All</button>
                         </div>
                         <div class="chart-wrapper">
                             <canvas id="powerConsumptionLineChart"></canvas>
@@ -3407,8 +3589,8 @@
 
                     <div class="chart-container">
                         <div class="chart-title">
-                            <i class="fas fa-chart-line"></i>
-                            Average Running Time Per Area (Daily)
+                            <span class="title-label"><i class="fas fa-chart-line"></i> Average Running Time Per Area (Daily)</span>
+                            <button class="btn btn-secondary btn-view-all" onclick="dashboard.showAllChartDatasetsById('runningTimeLineChart')">View All</button>
                         </div>
                         <div class="chart-wrapper">
                             <canvas id="runningTimeLineChart"></canvas>
@@ -3661,6 +3843,7 @@
                 this.chartResizeTimeout = null;
                 this.sidebarTransitioning = false;
                 this.sidebarTransitionTimeout = null;
+                this.fontScaleResizeTimeout = null;
                 this.machineVisible = true;
                 this.activeDateRangeSource = 'overview';
                 this.powerPanels = null;
@@ -3673,10 +3856,31 @@
             async init() {
                 await this.loadData();
                 this.setupEventListeners();
+                this.updateDynamicFontScale();
                 this.initializeSidebarPreference();
                 this.renderSidebar();
                 this.initializeDateInputs();
                 this.loadPage('overview');
+            }
+
+            updateDynamicFontScale() {
+                const root = document.documentElement;
+                const viewportWidth = window.innerWidth || document.documentElement.clientWidth || 1366;
+
+                let scale = 1;
+                if (viewportWidth <= 480) {
+                    scale = 0.82;
+                } else if (viewportWidth <= 768) {
+                    scale = 0.88;
+                } else if (viewportWidth <= 1024) {
+                    scale = 0.93;
+                } else if (viewportWidth <= 1366) {
+                    scale = 0.97;
+                } else if (viewportWidth >= 1920) {
+                    scale = 1.03;
+                }
+
+                root.style.setProperty('--font-scale', String(scale));
             }
             /**
              * Initialize sidebar auto-collapse preference
@@ -3854,6 +4058,13 @@
                     });
                 }
 
+                window.addEventListener('resize', () => {
+                    clearTimeout(this.fontScaleResizeTimeout);
+                    this.fontScaleResizeTimeout = setTimeout(() => {
+                        this.updateDynamicFontScale();
+                    }, 120);
+                });
+
                 this.setupSidebarTrigger();
             }
 
@@ -3866,6 +4077,34 @@
                 if (!sidebar) return;
 
                 let sidebarTimeout;
+                let interactionLockUntil = 0;
+
+                const lockSidebarInteraction = (duration = 700) => {
+                    interactionLockUntil = Date.now() + duration;
+                    clearTimeout(sidebarTimeout);
+                    if (this.sidebarAutoCollapse && !this.sidebarTransitioning) {
+                        sidebar.classList.add('active');
+                        if (container) container.classList.add('sidebar-hover-open');
+                    }
+                };
+
+                const isInteractionLocked = () => Date.now() < interactionLockUntil;
+
+                sidebar.addEventListener('wheel', () => {
+                    lockSidebarInteraction(900);
+                }, { passive: true });
+
+                sidebar.addEventListener('touchstart', () => {
+                    lockSidebarInteraction(1200);
+                }, { passive: true });
+
+                sidebar.addEventListener('touchmove', () => {
+                    lockSidebarInteraction(1200);
+                }, { passive: true });
+
+                sidebar.addEventListener('scroll', () => {
+                    lockSidebarInteraction(600);
+                }, { passive: true });
 
                 document.addEventListener('mousemove', (e) => {
                     if (!this.sidebarAutoCollapse) return;
@@ -3877,14 +4116,14 @@
                         sidebar.classList.add('active');
                         if (container) container.classList.add('sidebar-hover-open');
                         this.scheduleChartResize();
-                    } else if (!sidebar.matches(':hover')) {
+                    } else if (!sidebar.matches(':hover') && !isInteractionLocked()) {
                         sidebarTimeout = setTimeout(() => {
-                            if (!sidebar.matches(':hover')) {
+                            if (!sidebar.matches(':hover') && !isInteractionLocked()) {
                                 sidebar.classList.remove('active');
                                 if (container) container.classList.remove('sidebar-hover-open');
                                 this.scheduleChartResize();
                             }
-                        }, 100);
+                        }, 260);
                     }
                 });
 
@@ -3902,9 +4141,11 @@
                     if (!this.sidebarAutoCollapse) return;
 
                     sidebarTimeout = setTimeout(() => {
-                        sidebar.classList.remove('active');
-                        if (container) container.classList.remove('sidebar-hover-open');
-                                this.scheduleChartResize();
+                        if (!isInteractionLocked()) {
+                            sidebar.classList.remove('active');
+                            if (container) container.classList.remove('sidebar-hover-open');
+                            this.scheduleChartResize();
+                        }
                     }, 200);
                 });
             }
@@ -4322,6 +4563,89 @@
                     chartRef.update();
                 };
             }
+
+            hexToRgba(hex, alpha = 1) {
+                const value = String(hex || '').trim();
+                const short = value.match(/^#([0-9a-f]{3})$/i);
+                const full = value.match(/^#([0-9a-f]{6})$/i);
+
+                let normalized = value;
+                if (short) {
+                    normalized = `#${short[1].split('').map(ch => ch + ch).join('')}`;
+                } else if (!full) {
+                    return `rgba(59, 130, 246, ${alpha})`;
+                }
+
+                const parsed = normalized.slice(1);
+                const r = Number.parseInt(parsed.slice(0, 2), 16);
+                const g = Number.parseInt(parsed.slice(2, 4), 16);
+                const b = Number.parseInt(parsed.slice(4, 6), 16);
+                return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+            }
+
+            getShadedLineBackground(color) {
+                return (context) => {
+                    const chart = context.chart;
+                    const { ctx, chartArea } = chart;
+
+                    if (!chartArea) {
+                        return this.hexToRgba(color, 0.2);
+                    }
+
+                    const gradient = ctx.createLinearGradient(0, chartArea.top, 0, chartArea.bottom);
+                    gradient.addColorStop(0, this.hexToRgba(color, 0.34));
+                    gradient.addColorStop(1, this.hexToRgba(color, 0.02));
+                    return gradient;
+                };
+            }
+
+            createShadedLineDataset(label, data, color) {
+                return {
+                    label,
+                    data,
+                    borderColor: color,
+                    backgroundColor: this.getShadedLineBackground(color),
+                    borderWidth: 2,
+                    tension: 0.35,
+                    pointRadius: 3,
+                    pointHoverRadius: 5,
+                    pointBackgroundColor: color,
+                    pointBorderColor: color,
+                    pointBorderWidth: 1,
+                    fill: true
+                };
+            }
+
+            getShadedLineChartOptions({ beginAtZero = true, legendMaxHeight = 140 } = {}) {
+                return {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        filler: {
+                            propagate: true
+                        },
+                        legend: {
+                            labels: {
+                                color: '#e2e8f0',
+                                font: { family: 'var(--font-main)' }
+                            },
+                            maxHeight: legendMaxHeight
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero,
+                            ticks: { color: '#94a3b8' },
+                            grid: { color: '#2d3748' }
+                        },
+                        x: {
+                            ticks: { color: '#94a3b8' },
+                            grid: { color: '#2d3748' }
+                        }
+                    }
+                };
+            }
+
             renderAreaRunningTimeChart(section) {
                 const canvasId = `areaRunningTimeChart-${this.sanitizeId(section.name)}`;
                 const canvas = document.getElementById(canvasId);
@@ -4334,15 +4658,11 @@
                 section.equipment.forEach((eq, index) => {
                     const dailyData = days.map(() => Math.round(Math.random() * 24));
 
-                    datasets.push({
-                        label: eq.equipment_id,
-                        data: dailyData,
-                        borderColor: colors[index % colors.length],
-                        backgroundColor: colors[index % colors.length] + '30',
-                        borderWidth: 2,
-                        tension: 0.4,
-                        fill: false
-                    });
+                    datasets.push(this.createShadedLineDataset(
+                        eq.equipment_id,
+                        dailyData,
+                        colors[index % colors.length]
+                    ));
                 });
 
                 if (this.charts[canvasId]) this.charts[canvasId].destroy();
@@ -4353,29 +4673,7 @@
                         labels: days,
                         datasets
                     },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: {
-                                labels: {
-                                    color: '#e2e8f0',
-                                    font: { family: "var(--font-main)" }
-                                },
-                                maxHeight: 100
-                            }
-                        },
-                        scales: {
-                            y: {
-                                ticks: { color: '#94a3b8' },
-                                grid: { color: '#2d3748' }
-                            },
-                            x: {
-                                ticks: { color: '#94a3b8' },
-                                grid: { color: '#2d3748' }
-                            }
-                        }
-                    }
+                    options: this.getShadedLineChartOptions({ beginAtZero: true, legendMaxHeight: 140 })
                 });
 
                 this.applyLegendSelectionBehavior(this.charts[canvasId]);
@@ -4397,15 +4695,11 @@
                     const power = parseFloat(eq.power_rating) || 10;
                     const dailyData = days.map(() => (power * 24 * 0.746 * (0.7 + Math.random() * 0.3)).toFixed(1));
 
-                    datasets.push({
-                        label: eq.equipment_id,
-                        data: dailyData,
-                        borderColor: colors[index % colors.length],
-                        backgroundColor: colors[index % colors.length] + '30',
-                        borderWidth: 2,
-                        tension: 0.4,
-                        fill: false
-                    });
+                    datasets.push(this.createShadedLineDataset(
+                        eq.equipment_id,
+                        dailyData,
+                        colors[index % colors.length]
+                    ));
                 });
 
                 if (this.charts[canvasId]) this.charts[canvasId].destroy();
@@ -4416,29 +4710,7 @@
                         labels: days,
                         datasets
                     },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: {
-                                labels: {
-                                    color: '#e2e8f0',
-                                    font: { family: "var(--font-main)" }
-                                },
-                                maxHeight: 100
-                            }
-                        },
-                        scales: {
-                            y: {
-                                ticks: { color: '#94a3b8' },
-                                grid: { color: '#2d3748' }
-                            },
-                            x: {
-                                ticks: { color: '#94a3b8' },
-                                grid: { color: '#2d3748' }
-                            }
-                        }
-                    }
+                    options: this.getShadedLineChartOptions({ beginAtZero: true, legendMaxHeight: 140 })
                 });
 
                 this.applyLegendSelectionBehavior(this.charts[canvasId]);
@@ -4459,15 +4731,11 @@
                 section.equipment.forEach((eq, index) => {
                     const dailyData = days.map(() => (45 + Math.random() * 15).toFixed(1));
 
-                    datasets.push({
-                        label: eq.equipment_id,
-                        data: dailyData,
-                        borderColor: colors[index % colors.length],
-                        backgroundColor: colors[index % colors.length] + '30',
-                        borderWidth: 2,
-                        tension: 0.4,
-                        fill: false
-                    });
+                    datasets.push(this.createShadedLineDataset(
+                        eq.equipment_id,
+                        dailyData,
+                        colors[index % colors.length]
+                    ));
                 });
 
                 if (this.charts[canvasId]) this.charts[canvasId].destroy();
@@ -4478,30 +4746,7 @@
                         labels: days,
                         datasets
                     },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: {
-                                labels: {
-                                    color: '#e2e8f0',
-                                    font: { family: "var(--font-main)" }
-                                },
-                                maxHeight: 100
-                            }
-                        },
-                        scales: {
-                            y: {
-                                beginAtZero: false,
-                                ticks: { color: '#94a3b8' },
-                                grid: { color: '#2d3748' }
-                            },
-                            x: {
-                                ticks: { color: '#94a3b8' },
-                                grid: { color: '#2d3748' }
-                            }
-                        }
-                    }
+                    options: this.getShadedLineChartOptions({ beginAtZero: false, legendMaxHeight: 140 })
                 });
 
                 this.applyLegendSelectionBehavior(this.charts[canvasId]);
@@ -4714,7 +4959,15 @@
                     // header with title only
                     const header = document.createElement('div');
                     header.className = 'panel-card-header';
-                    header.innerHTML = `<div class="panel-title">${panel.name}</div>`;
+                    const panelVfdLabel = Array.isArray(panel.areas) && panel.areas.length > 0
+                        ? panel.areas.join(', ')
+                        : `VFD: ${panel.id || panel.name}`;
+                    header.innerHTML = `
+                        <div>
+                            <div class="panel-title">${panel.name}</div>
+                            <div class="panel-areas">${panelVfdLabel}</div>
+                        </div>
+                    `;
                     card.appendChild(header);
 
                     // metric boxes grid (previous design)
@@ -4902,18 +5155,23 @@
             renderCharts() {
                 if (!this.filteredData) return;
 
-                // Pie Chart - VFD Distribution
-                this.renderPieChart();
+                const chartRenders = [
+                    () => this.renderPieChart(),
+                    () => this.renderPowerConsumptionLineChart('powerConsumptionLineChart'),
+                    () => this.renderRunningTimeLineChart('runningTimeLineChart'),
+                    () => this.renderPowerRatePieChart('powerRatePieChart'),
+                    () => this.renderUtilizationPieChart('utilizationPieChart'),
+                    () => this.renderDowntimePieChart('downtimePieChart'),
+                    () => this.renderPeakDemandPieChart('peakDemandPieChart')
+                ];
 
-                // Line Charts
-                this.renderPowerConsumptionLineChart('powerConsumptionLineChart');
-                this.renderRunningTimeLineChart('runningTimeLineChart');
-
-                // Pie/Rate Charts
-                this.renderPowerRatePieChart('powerRatePieChart');
-                this.renderUtilizationPieChart('utilizationPieChart');
-                this.renderDowntimePieChart('downtimePieChart');
-                this.renderPeakDemandPieChart('peakDemandPieChart');
+                chartRenders.forEach(renderFn => {
+                    try {
+                        renderFn();
+                    } catch (error) {
+                        console.error('Chart render failed:', error);
+                    }
+                });
             }
 
             /**
@@ -5048,15 +5306,11 @@
                         return (base * variation).toFixed(1);
                     });
 
-                    datasets.push({
-                        label: section.name,
-                        data: dailyData,
-                        borderColor: colors[index % colors.length],
-                        backgroundColor: colors[index % colors.length] + '40',
-                        borderWidth: 2,
-                        tension: 0.4,
-                        fill: true
-                    });
+                    datasets.push(this.createShadedLineDataset(
+                        section.name,
+                        dailyData,
+                        colors[index % colors.length]
+                    ));
                 });
 
                 if (this.charts[canvasId]) this.charts[canvasId].destroy();
@@ -5067,33 +5321,12 @@
                         labels: days,
                         datasets
                     },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            filler: {
-                                propagate: true
-                            },
-                            legend: {
-                                labels: {
-                                    color: '#e2e8f0',
-                                    font: { family: "var(--font-main)" }
-                                }
-                            }
-                        },
-                        scales: {
-                            y: {
-                                stacked: false,
-                                ticks: { color: '#94a3b8' },
-                                grid: { color: '#2d3748' }
-                            },
-                            x: {
-                                ticks: { color: '#94a3b8' },
-                                grid: { color: '#2d3748' }
-                            }
-                        }
-                    }
+                    options: this.getShadedLineChartOptions({ beginAtZero: true, legendMaxHeight: 140 })
                 });
+
+                if (typeof this.applyLegendSelectionBehavior === 'function') {
+                    this.applyLegendSelectionBehavior(this.charts[canvasId]);
+                }
             }
 
             /**
@@ -5120,15 +5353,11 @@
                         return Math.round(baseHours * variation);
                     });
 
-                    datasets.push({
-                        label: section.name,
-                        data: dailyData,
-                        borderColor: colors[index % colors.length],
-                        backgroundColor: colors[index % colors.length] + '40',
-                        borderWidth: 2,
-                        tension: 0.4,
-                        fill: true
-                    });
+                    datasets.push(this.createShadedLineDataset(
+                        section.name,
+                        dailyData,
+                        colors[index % colors.length]
+                    ));
                 });
 
                 if (this.charts[canvasId]) this.charts[canvasId].destroy();
@@ -5139,33 +5368,12 @@
                         labels: days,
                         datasets
                     },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            filler: {
-                                propagate: true
-                            },
-                            legend: {
-                                labels: {
-                                    color: '#e2e8f0',
-                                    font: { family: "var(--font-main)" }
-                                }
-                            }
-                        },
-                        scales: {
-                            y: {
-                                stacked: false,
-                                ticks: { color: '#94a3b8' },
-                                grid: { color: '#2d3748' }
-                            },
-                            x: {
-                                ticks: { color: '#94a3b8' },
-                                grid: { color: '#2d3748' }
-                            }
-                        }
-                    }
+                    options: this.getShadedLineChartOptions({ beginAtZero: true, legendMaxHeight: 140 })
                 });
+
+                if (typeof this.applyLegendSelectionBehavior === 'function') {
+                    this.applyLegendSelectionBehavior(this.charts[canvasId]);
+                }
             }
 
             /**
@@ -5989,35 +6197,9 @@
                     type: 'line',
                     data: {
                         labels: days,
-                        datasets: [{
-                            label: 'Hours',
-                            data,
-                            borderColor: '#3b82f6',
-                            backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                            borderWidth: 2,
-                            tension: 0.4,
-                            fill: true
-                        }]
+                        datasets: [this.createShadedLineDataset('Hours', data, '#3b82f6')]
                     },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: {
-                                labels: { color: '#e2e8f0' }
-                            }
-                        },
-                        scales: {
-                            y: {
-                                ticks: { color: '#94a3b8' },
-                                grid: { color: '#2d3748' }
-                            },
-                            x: {
-                                ticks: { color: '#94a3b8' },
-                                grid: { color: '#2d3748' }
-                            }
-                        }
-                    }
+                    options: this.getShadedLineChartOptions({ beginAtZero: true, legendMaxHeight: 140 })
                 });
             }
 
@@ -6038,35 +6220,9 @@
                     type: 'line',
                     data: {
                         labels: days,
-                        datasets: [{
-                            label: 'kWh',
-                            data,
-                            borderColor: '#10b981',
-                            backgroundColor: 'rgba(16, 185, 129, 0.1)',
-                            borderWidth: 2,
-                            tension: 0.4,
-                            fill: true
-                        }]
+                        datasets: [this.createShadedLineDataset('kWh', data, '#10b981')]
                     },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: {
-                                labels: { color: '#e2e8f0' }
-                            }
-                        },
-                        scales: {
-                            y: {
-                                ticks: { color: '#94a3b8' },
-                                grid: { color: '#2d3748' }
-                            },
-                            x: {
-                                ticks: { color: '#94a3b8' },
-                                grid: { color: '#2d3748' }
-                            }
-                        }
-                    }
+                    options: this.getShadedLineChartOptions({ beginAtZero: true, legendMaxHeight: 140 })
                 });
             }
 
@@ -6086,35 +6242,9 @@
                     type: 'line',
                     data: {
                         labels: days,
-                        datasets: [{
-                            label: 'kWh Peak',
-                            data: peakData,
-                            borderColor: '#f59e0b',
-                            backgroundColor: 'rgba(245, 158, 11, 0.1)',
-                            borderWidth: 2,
-                            tension: 0.4,
-                            fill: true
-                        }]
+                        datasets: [this.createShadedLineDataset('kWh Peak', peakData, '#f59e0b')]
                     },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: {
-                                labels: { color: '#e2e8f0' }
-                            }
-                        },
-                        scales: {
-                            y: {
-                                ticks: { color: '#94a3b8' },
-                                grid: { color: '#2d3748' }
-                            },
-                            x: {
-                                ticks: { color: '#94a3b8' },
-                                grid: { color: '#2d3748' }
-                            }
-                        }
-                    }
+                    options: this.getShadedLineChartOptions({ beginAtZero: true, legendMaxHeight: 140 })
                 });
             }
 
@@ -6134,36 +6264,9 @@
                     type: 'line',
                     data: {
                         labels: days,
-                        datasets: [{
-                            label: 'Hz',
-                            data: frequencyData,
-                            borderColor: '#ef4444',
-                            backgroundColor: 'rgba(239, 68, 68, 0.1)',
-                            borderWidth: 2,
-                            tension: 0.4,
-                            fill: true
-                        }]
+                        datasets: [this.createShadedLineDataset('Hz', frequencyData, '#ef4444')]
                     },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: {
-                                labels: { color: '#e2e8f0' }
-                            }
-                        },
-                        scales: {
-                            y: {
-                                beginAtZero: false,
-                                ticks: { color: '#94a3b8' },
-                                grid: { color: '#2d3748' }
-                            },
-                            x: {
-                                ticks: { color: '#94a3b8' },
-                                grid: { color: '#2d3748' }
-                            }
-                        }
-                    }
+                    options: this.getShadedLineChartOptions({ beginAtZero: false, legendMaxHeight: 140 })
                 });
             }
 
